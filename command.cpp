@@ -17,14 +17,11 @@ public:
     virtual void execute() = 0;
 
     void undo() {
-        if (!prevCommand) {
-            return;
-        }
-        this->text = prevCommand->text;
+        context = text;
     }
 
     void showState() const {
-        cout << "State is " << this->text << endl;
+        cout << "State is " << context << endl;
     }
 };
 
@@ -33,7 +30,8 @@ class AddACommand: public Command{
         AddACommand(Command * prevCommand): Command(prevCommand) {}
 
         void execute() {
-            this->text += "A";
+            text = context;
+            context += "A";
         }
 };
 
@@ -42,7 +40,7 @@ class AddBCommand: public Command{
         AddBCommand(Command * prevCommand): Command(prevCommand) {}
 
         void execute() {
-            this->text += "B";
+            context += "B";
         }
 };
 
@@ -50,6 +48,8 @@ int main() {
     Command* aCommand = new AddACommand(0);
     Command* bCommand = new AddBCommand(aCommand);
     bCommand->showState();
+    aCommand->execute();
+    bCommand->execute();
     bCommand->undo();
     bCommand->showState();
     delete aCommand;
