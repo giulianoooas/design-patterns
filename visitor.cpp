@@ -5,36 +5,27 @@ using namespace std;
 
 // patterns used Visitor + Composite
 
-class Visitor;
+class SimpleElement;
+class CompositeElement;
 
+class Visitor {
+protected:
+    int total;
+public:
+    Visitor(): total(0) {}
+
+    virtual void visitSimpleElement(SimpleElement* element) = 0; 
+    virtual void visitComplexElement(CompositeElement* element) = 0;
+
+    void showTotal() const {
+        cout << this->total << endl;
+    }
+};
 class Element {
 public:
     virtual void addElement(Element * elem) = 0;
     virtual int getValue() const = 0;
     virtual void acceptVisitor(Visitor* v) = 0;
-};
-
-class SimpleElement;
-
-class CompositeElement;
-
-class Visitor {
-private:
-    int total;
-public:
-    Visitor(): total(0) {}
-
-    void visitSimpleElement(Element* element) {
-        this->total += element->getValue();
-    }
-
-    void visitComplexElement(Element* element) {
-        this->total += 10;
-    }
-
-    void showTotal() const {
-        cout << this->total << endl;
-    }
 };
 
 class SimpleElement : public Element{
@@ -87,6 +78,17 @@ public:
     };
 };
 
+class ConcreteVisitor: public Visitor{
+public:
+    void visitSimpleElement(SimpleElement* element) {
+        this->total += element->getValue();
+    }
+
+    void visitComplexElement(CompositeElement* element) {
+        this->total += element->getSize();
+    }
+};
+
 
 int main() {
     CompositeElement elem;
@@ -94,7 +96,7 @@ int main() {
     elem.addElement(&s1);
     elem.addElement(&s2);
 
-    Visitor v;
+    ConcreteVisitor v;
 
     elem.acceptVisitor(&v);
     v.showTotal();
